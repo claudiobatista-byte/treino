@@ -1,0 +1,1612 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Treino — Push / Pull / Legs (PPL)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --surface2: #f0f2f5;
+  --border: #dde1e7;
+  --text: #1a1d23;
+  --muted: #6b7280;
+  --accent: #1d6fa4;
+  --accent-dim: rgba(29,111,164,0.09);
+  --green: #1a7a3c;
+  --green-dim: rgba(26,122,60,0.09);
+  --orange: #b45309;
+  --orange-dim: rgba(180,83,9,0.09);
+  --red: #b91c1c;
+  --red-dim: rgba(185,28,28,0.09);
+  --purple: #6d28d9;
+  --purple-dim: rgba(109,40,217,0.09);
+  --radius: 10px;
+  --radius-sm: 6px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
+
+/* HEADER */
+.top-header { background: var(--surface); border-bottom: 2px solid var(--border); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 50; gap: 8px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
+.top-header h1 { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--text); }
+.header-right { display: flex; align-items: center; gap: 8px; }
+.cycle-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(34,211,238,0.25); border-radius: 20px; padding: 3px 12px; text-transform: uppercase; white-space: nowrap; }
+.btn-reset { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 0.06em; background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.25); border-radius: 20px; padding: 3px 10px; cursor: pointer; text-transform: uppercase; white-space: nowrap; }
+.btn-reset:hover { background: rgba(248,81,73,0.18); }
+
+/* TAB BAR */
+.tab-bar { display: flex; background: var(--surface); border-bottom: 2px solid var(--border); padding: 0 12px; gap: 0; overflow-x: auto; }
+.tab-btn { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; border: none; background: transparent; color: var(--muted); padding: 11px 14px; cursor: pointer; border-bottom: 2px solid transparent; transition: color .2s, border-color .2s; white-space: nowrap; flex-shrink: 0; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+.tab-btn.tab-relatorio { color: var(--purple); }
+.tab-btn.tab-relatorio.active { color: var(--purple); border-bottom-color: var(--purple); }
+
+/* PANELS */
+.treino-panel { display: none; padding: 14px 14px 0; }
+.treino-panel.active { display: block; }
+
+/* TREINO TITLE */
+.treino-title { font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 700; letter-spacing: 0.04em; color: var(--accent); text-transform: uppercase; margin-bottom: 3px; }
+.treino-desc { font-size: 11px; color: var(--muted); margin-bottom: 14px; letter-spacing: 0.02em; }
+
+/* EXERCISE CARD */
+.ex-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 9px; overflow: hidden; transition: border-color .2s; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+.ex-card.open { border-color: rgba(34,211,238,0.35); }
+.ex-card.selected { border-color: var(--green); }
+
+.ex-header { display: flex; align-items: center; gap: 9px; padding: 12px 13px; cursor: pointer; user-select: none; }
+.ex-check { width: 19px; height: 19px; border-radius: 50%; border: 2px solid var(--border); flex-shrink: 0; display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s; }
+.ex-card.selected .ex-check { background: var(--green); border-color: var(--green); }
+.ex-check svg { display: none; }
+.ex-card.selected .ex-check svg { display: block; }
+
+.ex-name { font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 600; letter-spacing: 0.03em; flex: 1; }
+.ex-meta { display: flex; gap: 5px; flex-shrink: 0; }
+.tag { font-size: 10px; font-weight: 500; border-radius: 4px; padding: 2px 6px; letter-spacing: 0.03em; }
+.tag-blue { background: #dbeafe; color: #1e40af; }
+.tag-orange { background: #fff7ed; color: #9a3412; }
+.ex-chevron { color: var(--muted); transition: transform .25s; font-size: 14px; flex-shrink: 0; }
+.ex-card.open .ex-chevron { transform: rotate(180deg); }
+
+/* SPECS + TARGET */
+.ex-specs { display: flex; gap: 14px; padding: 0 13px 10px 41px; }
+.spec { font-size: 11px; color: var(--muted); }
+.spec strong { color: var(--text); font-weight: 500; }
+.ex-target { padding: 8px 13px 11px 41px; font-size: 11px; color: var(--muted); line-height: 1.5; border-top: 1px solid var(--border); }
+.ex-target span { color: var(--accent); font-weight: 500; }
+
+/* VARIATIONS DRAWER */
+.ex-drawer { display: none; border-top: 1px solid var(--border); background: var(--surface2); }
+.ex-card.open .ex-drawer { display: block; }
+.drawer-header { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 9px 13px 5px; }
+
+.var-item { display: flex; align-items: flex-start; gap: 9px; padding: 9px 13px; cursor: pointer; border-top: 1px solid rgba(48,54,61,0.5); transition: background .15s; }
+.var-item:hover { background: rgba(29,111,164,0.05); }
+.var-item.chosen { background: var(--green-dim); }
+.var-num { font-family: 'Barlow Condensed', sans-serif; font-size: 17px; font-weight: 700; color: var(--border); flex-shrink: 0; width: 18px; line-height: 1; }
+.var-item.chosen .var-num { color: var(--green); }
+.var-content { flex: 1; }
+.var-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+.var-item.chosen .var-name { color: var(--green); }
+.var-desc { font-size: 11px; color: var(--muted); line-height: 1.5; }
+.var-badge { font-size: 10px; border-radius: 4px; padding: 2px 6px; margin-top: 4px; display: inline-block; }
+.badge-mtor-alon { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+.badge-mtor-conc { background: #dbeafe; color: #1d4ed8; border: 1px solid #93c5fd; }
+.badge-mtor-exc  { background: #ede9fe; color: #5b21b6; border: 1px solid #c4b5fd; }
+.badge-joint     { background: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
+
+/* ACTION BUTTONS */
+.action-bar { display: flex; gap: 9px; padding: 16px 14px 10px; }
+.btn-save { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: var(--green-dim); color: var(--green); border: 1px solid rgba(63,185,80,0.3); border-radius: var(--radius-sm); padding: 11px; cursor: pointer; transition: background .2s; }
+.btn-save:hover { background: rgba(63,185,80,0.18); }
+.btn-next { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(34,211,238,0.3); border-radius: var(--radius-sm); padding: 11px; cursor: pointer; transition: background .2s; }
+.btn-next:hover { background: rgba(34,211,238,0.18); }
+
+/* RELATÓRIO */
+.rel-header { font-family: 'Barlow Condensed', sans-serif; font-size: 21px; font-weight: 700; color: var(--purple); text-transform: uppercase; margin-bottom: 14px; }
+.rel-empty { font-size: 13px; color: var(--muted); padding: 30px 0; text-align: center; }
+.rel-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); margin-bottom: 10px; overflow: hidden; }
+.rel-card-header { display: flex; align-items: center; justify-content: space-between; padding: 11px 13px; cursor: pointer; }
+.rel-treino-badge { font-family: 'Barlow Condensed', sans-serif; font-size: 22px; font-weight: 700; color: var(--accent); width: 28px; background: var(--accent-dim); border-radius: 6px; text-align:center; padding: 2px 4px; }
+.rel-treino-badge.b-B { color: var(--orange); }
+.rel-treino-badge.b-C { color: var(--green); }
+.rel-meta-col { flex: 1; padding-left: 10px; }
+.rel-date { font-size: 12px; color: var(--text); font-weight: 500; }
+.rel-excount { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.rel-chevron { color: var(--muted); font-size: 13px; transition: transform .2s; }
+.rel-card.open .rel-chevron { transform: rotate(180deg); }
+.rel-body { display: none; border-top: 1px solid var(--border); background: var(--surface2); padding: 10px 13px; }
+.rel-card.open .rel-body { display: block; }
+.rel-ex-row { display: flex; align-items: baseline; gap: 8px; padding: 4px 0; border-bottom: 1px solid rgba(48,54,61,0.4); }
+.rel-ex-row:last-child { border-bottom: none; }
+.rel-ex-name { font-size: 11px; color: var(--muted); flex: 1; }
+.rel-ex-var { font-size: 11px; color: var(--text); text-align: right; max-width: 55%; }
+.rel-clear { margin-top: 16px; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.25); border-radius: var(--radius-sm); padding: 8px 16px; cursor: pointer; }
+.rel-clear:hover { background: rgba(248,81,73,0.18); }
+.rel-stats { display: flex; gap: 8px; margin-bottom: 16px; }
+.stat-pill { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; text-align: center; }
+.stat-num { font-family: 'Barlow Condensed', sans-serif; font-size: 26px; font-weight: 700; color: var(--accent); }
+.stat-num.orange { color: #b45309; }
+.stat-num.green { color: #1a7a3c; }
+.stat-label { font-size: 10px; color: var(--muted); margin-top: 2px; }
+
+/* TOAST */
+.toast { position: fixed; bottom: 22px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a1d23; border: 1px solid #1a1d23; border-radius: var(--radius-sm); padding: 9px 18px; font-size: 12px; color: #f5f6f8; z-index: 100; transition: transform .3s, opacity .3s; opacity: 0; white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis; }
+.toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+.toast.green { background: #14532d; border-color: #14532d; color: #bbf7d0; }
+
+/* MODAL RESET */
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200; align-items: center; justify-content: center; }
+.modal-overlay.show { display: flex; }
+.modal-box { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 22px 20px; max-width: 300px; width: 90%; box-shadow: 0 8px 32px rgba(0,0,0,0.18); }
+.modal-title { font-family: 'Barlow Condensed', sans-serif; font-size: 18px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+.modal-desc { font-size: 12px; color: var(--muted); line-height: 1.6; margin-bottom: 18px; }
+.modal-btns { display: flex; gap: 10px; }
+.modal-btn-cancel { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 10px; cursor: pointer; }
+.modal-btn-confirm { flex: 1; font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,81,73,0.3); border-radius: var(--radius-sm); padding: 10px; cursor: pointer; }
+</style>
+</head>
+<body>
+
+<div class="top-header">
+  <h1>Push / Pull / Legs (PPL)</h1>
+  <div class="header-right">
+    <div class="cycle-badge" id="cycleBadge">Ciclo A</div>
+    <button class="btn-reset" onclick="openResetModal()">↺ Reiniciar</button>
+  </div>
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" id="tab-A" onclick="showTab('A')">A — Puxar</button>
+  <button class="tab-btn" id="tab-B" onclick="showTab('B')">B — Empurrar</button>
+  <button class="tab-btn" id="tab-C" onclick="showTab('C')">C — Pernas</button>
+  <button class="tab-btn tab-relatorio" id="tab-R" onclick="showTab('R')">Relatório</button>
+</div>
+
+<!-- ==================== TREINO A ==================== -->
+<div class="treino-panel active" id="panel-A">
+  <div class="treino-title">Treino A — Puxar</div>
+  <div class="treino-desc">Costas · Trapézio · Bíceps · Antebraço</div>
+
+  <!-- A1: Puxada Alta Pronada -->
+  <div class="ex-card" id="A1">
+    <div class="ex-header" onclick="toggleCard('A1')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Puxada Alta Pronada</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×10-12</span><span class="tag tag-orange">Lat — Largura</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>90s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Fibras verticais do latíssimo do dorso (largura das costas)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A1','Puxada Alta Pronada Larga')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Puxada Alta Pronada Larga</div>
+          <div class="var-desc">Pegada pronada além da largura dos ombros. Cotovelo desce em diagonal para baixo e para trás. Alongamento máximo no topo ativa mTOR via tensão excêntrica das fibras verticais do lat.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: excêntrico alongado</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A1','Puxada Supinada Média')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Puxada Supinada Média</div>
+          <div class="var-desc">Pegada supinada na largura dos ombros. Permite ROM superior e maior extensão do ombro na fase final — ativa a porção inferior do lat de forma mais cirúrgica. Bíceps age como sinergista secundário.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: contração inferior do lat</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A1','Puxada Neutra (Barra V ou Alças)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Puxada Neutra (Barra V / Alças — Polia ou Máquina Lat)</div>
+          <div class="var-desc">Pegada neutra paralela, cotovelo aduz próximo ao tronco. Disponível em polia alta com barra V, alças individuais, ou Máquina de Lat Pulldown com assento fixo e cabo neutro. Ativa porção medial do lat e redondo maior com menor sobrecarga do manguito rotador.</div>
+          <span class="var-badge badge-joint">Articular: ombro seguro — polia ou máquina</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A1','Puxada Inclinada (Ângulo 70°)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Puxada Inclinada (Ângulo 70°)</div>
+          <div class="var-desc">Banco inclinado a 70° na barra fixa ou polia alta inclinada. O ângulo intermediário entre a puxada vertical e a remada recruta fibras oblíquas do lat e a porção teres major de forma diferenciada.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: ativação oblíqua do lat</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A1','Puxada com Pausa Isométrica no Ponto Médio')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Puxada com Pausa Isométrica no Ponto Médio</div>
+          <div class="var-desc">Qualquer pegada com pausa de 2–3 s a 90° de flexão do cotovelo. O ponto médio é onde a curva de força do lat é mais desfavorável — a pausa isométrica recruta unidades motoras extras e potencializa o sinal mTOR.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: recrutamento isométrico</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A2: Remada Baixa -->
+  <div class="ex-card" id="A2">
+    <div class="ex-header" onclick="toggleCard('A2')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Remada Baixa (Triângulo)</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×10-12</span><span class="tag tag-orange">Costas — Espessura</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>90s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Espessura das costas — romboides, trapézio médio/inferior, lat (porção medial)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A2','Remada Baixa Triângulo — Cotovelo Aduzido')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Remada Baixa Triângulo — Cotovelo Aduzido</div>
+          <div class="var-desc">Polia baixa, puxar o triângulo até o abdome com cotovelos colados ao tronco. Retração escapular completa no final com pausa de 1–2s. Foco no trapézio médio e romboides.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: retração escapular máxima</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A2','Remada Curvada com Barra (45°)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Remada Curvada com Barra (45°)</div>
+          <div class="var-desc">Tronco inclinado 45°, barra puxada até o umbigo. Carga livre recruta estabilizadores lombares e aumenta o ROM de protração-retração da escápula. Excêntrico de 3s ativa mTOR no ponto de máximo alongamento dos romboides.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: excêntrico — romboides</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A2','Remada Haltere Unilateral (Cavalinho)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Remada Haltere Unilateral (Cavalinho)</div>
+          <div class="var-desc">Apoio ipsilateral no banco, foco em cada lado separado. Permite amplitude superior de retração e depressão escapular. Corrige assimetrias de força e ativação entre os lados.</div>
+          <span class="var-badge badge-joint">Articular: assimetria + amplitude</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A2','Remada Unilateral em Máquina Convergente')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Remada na Máquina Convergente (Low Row Machine)</div>
+          <div class="var-desc">Máquina de remada com assento ajustável e apoio peitoral. Trajetória convergente guiada com adução horizontal do cotovelo. Isola o lat e romboide sem variável de estabilização lombar. Pausa de 2 s na retração máxima. Ideal para alto volume de espessura.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: retração pura — low row machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A2','Remada Alta (High Row) — Polia ou Máquina')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Remada Alta (High Row) — Polia ou Máquina</div>
+          <div class="var-desc">Polia alta puxada até o peito com cotovelos abrindo para o lado (90°). Ativa o trapézio médio e inferior de forma diferente da remada baixa — vetor descendente recruta as fibras inferiores do trapézio que a remada horizontal não cobre.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: trapézio inferior</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A3: Encolhimento — CORRIGIDO -->
+  <div class="ex-card" id="A3">
+    <div class="ex-header" onclick="toggleCard('A3')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Encolhimento com Halteres</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×12-15</span><span class="tag tag-orange">Trapézio Superior</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Trapézio superior — fibras descendentes (elevação da escápula / encolhimento do ombro)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A3','Encolhimento com Halteres — Neutro')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Encolhimento com Halteres — Neutro</div>
+          <div class="var-desc">Halteres nas laterais, elevação vertical pura da escápula (sem rotação). Descida lenta de 3–4s com depressão total do ombro ativa mTOR nas fibras descendentes do trapézio superior via tensão excêntrica.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico trapézio sup.</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A3','Encolhimento com Barra — Clássico')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Encolhimento com Barra — Clássico</div>
+          <div class="var-desc">Pegada pronada ligeiramente mais larga que os ombros. Maior carga possível para elevação da escápula. Movimento vertical puro — sem rotação de ombro ou encurvamento cervical. Pausa de 1–2s no topo.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: sobrecarga + pausa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A3','Encolhimento na Polia Baixa (Corda por Baixo)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Encolhimento na Polia Baixa (Corda ou Triângulo)</div>
+          <div class="var-desc">Polia baixa com pegada neutra — o vetor de força puxa os ombros para baixo, criando resistência exatamente no sentido oposto à elevação da escápula. Tensão constante durante todo o ROM do trapézio superior, incluindo o ponto mais baixo onde halteres perdem resistência.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: tensão na posição deprimida</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A3','Encolhimento com Rotação Leve (Ênfase Fibras Médias)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Encolhimento na Shrug Machine (Plataforma Dedicada)</div>
+          <div class="var-desc">Máquina de encolhimento com plataforma elevada e pegada neutra. O design ergonômico posiciona os halteres mais lateralmente que a barra, reduzindo rotação interna involuntária. Permite carga superior com postura vertebral controlada. Pausa de 2 s + excêntrico de 3 s.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: carga máxima — shrug machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A3','Encolhimento Isométrico no Topo (3 s)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Encolhimento Isométrico no Topo (3 s)</div>
+          <div class="var-desc">Qualquer variante com pausa isométrica de 3 s no ponto de máxima elevação escapular. A contração sustentada recruta unidades motoras de limiar alto do trapézio superior, estimulando fibras que o movimento dinâmico rápido não alcança.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: isométrico fibras alto limiar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A4: Rosca Direta -->
+  <div class="ex-card" id="A4">
+    <div class="ex-header" onclick="toggleCard('A4')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Rosca Direta (Barra W)</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×10-12</span><span class="tag tag-orange">Bíceps Cabeça Curta</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Cabeça curta (medial) do bíceps — pico e largura do músculo</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A4','Rosca Direta Barra W')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Direta Barra W</div>
+          <div class="var-desc">Pegada semi-supinada reduz estresse no pulso. Cotovelos fixos, descida excêntrica de 3–4s. Cabeça curta é mais ativa com cotovelo afastado do tronco — a barra EZ naturalmente abre levemente a pegada, favorecendo esse recrutamento.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico cabeça curta</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A4','Rosca Concentrada (Cotovelo no Joelho)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Concentrada (Cotovelo no Joelho)</div>
+          <div class="var-desc">Cotovelo apoiado na face interna do joelho, braço afastado do tronco — posição que coloca a cabeça curta no seu comprimento máximo de trabalho. Maior ativação eletromiográfica da cabeça curta comprovada em estudos de EMG.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: posição alongada cab. curta</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A4','Rosca Scott (Banco Preacher)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Scott — Preacher Curl Machine (Selectorizada)</div>
+          <div class="var-desc">Máquina Scott com apoio de cotovelo fixo e curva de resistência calculada para o bíceps. Elimina qualquer compensação do deltóide. O início do movimento (cotovelo estendido) é a posição de maior tensão mTOR para a cabeça curta. Falha muscular segura sem risco de queda da barra.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: tensão posição longa — preacher machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A4','Rosca 21s (7+7+7 — Cabeça Curta)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Rosca 21s (7+7+7 — Cabeça Curta)</div>
+          <div class="var-desc">7 reps na metade inferior (0–90°) + 7 na superior (90–180°) + 7 completas. Divide o arco de movimento em três zonas de tensão, garantindo estímulo mTOR tanto na posição alongada quanto no pico de contração da cabeça curta.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: espectro total de tensão</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A4','Rosca Zottman (Supinado na Subida, Pronado na Descida)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Zottman (Supinado na Subida, Pronado na Descida)</div>
+          <div class="var-desc">Sobe supinado (ativa cabeça curta no concêntrico), prona no topo e desce pronado (excêntrico sobrecarregado do braquiorradial). Combina estímulo máximo da cabeça curta no concêntrico com mTOR excêntrico do antebraço na descida.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: bíceps + braquiorradial combinados</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A5: Rosca Martelo -->
+  <div class="ex-card" id="A5">
+    <div class="ex-header" onclick="toggleCard('A5')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Rosca Martelo</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×10-12</span><span class="tag tag-orange">Bíceps Cab. Longa + Braquiorradial</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Cabeça longa do bíceps (espessura externa) + braquiorradial do antebraço</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A5','Rosca Martelo Bilateral Halteres')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Martelo Bilateral Halteres</div>
+          <div class="var-desc">Pegada neutra, cotovelos fixos. A posição neutra (sem supinação) desfavorece a cabeça curta e recruta preferencialmente a cabeça longa e o braquiorradial. Excêntrico de 3s maximiza tensão no comprimento longo.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico cab. longa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A5','Rosca Martelo Cruzada (Cross-body)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Martelo Cruzada (Cross-body)</div>
+          <div class="var-desc">Haltere cruza o corpo em direção ao ombro oposto com o braço levemente aduzido. Essa trajetória aumenta ainda mais a ativação do braquial (músculo profundo que cruza apenas o cotovelo) e do braquiorradial, adicionando espessura global ao braço.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: braquial profundo</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A5','Rosca Martelo Polia Baixa (Corda Neutra)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Martelo Polia Baixa (Corda Neutra)</div>
+          <div class="var-desc">Corda na polia baixa, pegada neutra. Tensão constante em toda a amplitude elimina a "zona morta" dos halteres no início do movimento (posição mais alongada), onde a cabeça longa e o braquiorradial são mais vulneráveis ao estímulo de hipertrofia.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: tensão na posição longa</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A5','Rosca Inclinada no Banco 45° (Cabeça Longa em Pré-Alongamento)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Inclinada no Banco 45° (Cabeça Longa em Pré-Alongamento)</div>
+          <div class="var-desc">Sentado em banco inclinado a 45°, braços pendurados para trás. O ombro em extensão coloca a cabeça longa em pré-alongamento máximo antes mesmo do movimento começar. Protocolo mTOR de referência para a porção longa do bíceps.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: pré-alongamento máximo cab. longa</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A5','Rosca Spidercurl (Peito no Banco Inclinado)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Spidercurl — Banco Inclinado 45° ou Máquina de Preacher Invertida</div>
+          <div class="var-desc">Deitado de bruços no banco inclinado 45°, braços pendurados verticalmente. Equivalente a uma Preacher invertida: cotovelo em posição baixa elimina compensação do deltóide. Disponível em bancos livres ou máquinas específicas com suporte ventral. Alta tensão no braquiorradial e cabeça longa.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: isolamento gravitacional cab. longa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- A6: Rosca Inversa -->
+  <div class="ex-card" id="A6">
+    <div class="ex-header" onclick="toggleCard('A6')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Rosca Inversa</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×12-15</span><span class="tag tag-orange">Extensores Antebraço</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Extensores do carpo (antebraço dorsal) + braquiorradial em pronação</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('A6','Rosca Inversa Polia Baixa — Barra Reta')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Inversa Polia Baixa — Barra Reta</div>
+          <div class="var-desc">Polia baixa, pegada pronada. Tensão constante em toda a amplitude, incluindo o ponto inicial (extensores mais alongados). Braquiorradial em pronação e extensores do carpo ativados durante todo o movimento.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: tensão contínua nos extensores</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A6','Rosca Inversa com Barra W — Livre')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Rosca Inversa com Barra W — Livre</div>
+          <div class="var-desc">Barra EZ pronada reduz a pronação forçada do rádio, diminuindo risco de tendinopatia lateral do cotovelo. Descida excêntrica de 3s com extensão total do cotovelo para maximizar o alongamento dos extensores do carpo.</div>
+          <span class="var-badge badge-joint">Articular: pulso e cotovelo seguros</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('A6','Extensão de Pulso no Banco (Isolamento Extensor)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Extensão de Pulso no Banco (Isolamento Extensor)</div>
+          <div class="var-desc">Antebraço apoiado no banco, cotovelo fixo, movimento exclusivo do punho (extensão do carpo). Isola cirurgicamente os extensores do carpo — ECRL, ECRB e ECU. Pode complementar a rosca inversa no mesmo treino com carga leve e alto volume.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: isolamento extensor do carpo</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A6','Rotação de Punho Pronado-Supinado com Haltere Leve')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Rotação de Punho Pronado-Supinado com Haltere Leve</div>
+          <div class="var-desc">Antebraço apoiado no banco, rotação completa do pulso de pronação total a supinação total com haltere leve. Ativa pronadores e supinadores do antebraço além dos extensores — cobertura total da musculatura intrínseca do antebraço.</div>
+          <span class="var-badge badge-joint">Articular: cobertura antebraço total</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('A6','Farmer's Carry (Caminhada com Carga)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Wrist Roller (Rolo de Pulso — Máquina de Antebraço)</div>
+          <div class="var-desc">Dispositivo com rolo e corda para enrolar e desenrolar carga via pronação e supinação. Ativa extensores e flexores do carpo de forma alternada com tensão constante e progressiva. Protocolo: 3 séries de enrolar + desenrolar completos. Máximo volume de antebraço por série.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: extensores + flexores alternados</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-save" onclick="saveTreino('A')">✓ Salvar Treino A</button>
+    <button class="btn-next" onclick="nextTreino()">Próximo Treino →</button>
+  </div>
+</div>
+
+<!-- ==================== TREINO B ==================== -->
+<div class="treino-panel" id="panel-B">
+  <div class="treino-title">Treino B — Empurrar</div>
+  <div class="treino-desc">Peito · Ombros · Tríceps</div>
+
+  <!-- B1: Supino Reto -->
+  <div class="ex-card" id="B1">
+    <div class="ex-header" onclick="toggleCard('B1')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Supino Reto com Barra</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×8-10</span><span class="tag tag-orange">Peitoral Médio/Inf.</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>8–10</strong> reps</div><div class="spec"><strong>2min</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Porção esterno-costal do peitoral maior (peito médio e inferior)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B1','Supino Reto Barra — Clássico')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Supino Reto Barra — Clássico</div>
+          <div class="var-desc">Toque suave no peito com pausa de 1s (elimina o reflexo miotático), descida excêntrica de 3–4s. A posição de máximo alongamento da porção esterno-costal (barra no peito) é o pico de tensão mTOR. Arco lombar controlado e escápulas retraídas.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico + pausa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B1','Supino Reto com Halteres')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Supino Reto com Halteres</div>
+          <div class="var-desc">Amplitude superior à barra — halteres descem abaixo do nível do esterno, aumentando o alongamento da porção esterno-costal. Maior ativação de fibras em posição longa. Excêntrico lento de 4s é obrigatório para aproveitar o estímulo mTOR adicional.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: amplitude total esterno-costal</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B1','Supino Reto Máquina Convergente')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Chest Press Convergente — Hammer Strength / Life Fitness</div>
+          <div class="var-desc">Máquinas plate-loaded tipo Hammer Strength ou seletorizadas Life Fitness. A trajetória convergente replica a adução horizontal do peitoral com arco biomecânico superior à barra. Estudo de EMG mostra ativação comparável à barra livre. Pausa de 2 s no máximo alongamento. Ideal para treino solo.</div>
+          <span class="var-badge badge-joint">Máquina: Hammer Strength / selectorizada</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B1','Supino com Correntes ou Elásticos (Acomodação de Resistência)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Supino com Correntes ou Elásticos (Acomodação de Resistência)</div>
+          <div class="var-desc">Barra livre com correntes ou elásticos adicionados. Resistência aumenta progressivamente durante a subida, compensando a vantagem mecânica crescente. Resulta em estímulo mTOR mais uniforme em todo o arco — especialmente no ponto de contração final onde o supino normal perde tensão.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: resistência acomodada uniforme</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B1','Supino Pausa Longa (Dead-Stop Bench Press)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Supino Pausa Longa (Dead-Stop Bench Press)</div>
+          <div class="var-desc">Barra pausa 3–5 s no peito (elimina o reflexo elástico). Cada rep começa do repouso completo, forçando recrutamento máximo de unidades motoras para vencer a inércia. Estímulo neural superior e mTOR na posição de máximo alongamento a cada repetição.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: dead-stop + recrutamento máximo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B2: Supino Inclinado -->
+  <div class="ex-card" id="B2">
+    <div class="ex-header" onclick="toggleCard('B2')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Supino Inclinado (Halteres)</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×10-12</span><span class="tag tag-orange">Peitoral Superior (Clavicular)</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>90s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Porção clavicular do peitoral maior (peito superior)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B2','Supino Inclinado Halteres (30–45°)')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Supino Inclinado Halteres (30–45°)</div>
+          <div class="var-desc">Banco a 30–45° (acima de 45° transfere carga excessiva para o deltóide anterior). Halteres descem até a linha do queixo com rotação interna leve no topo. Excêntrico lento ativa mTOR na clavicular em posição de máximo alongamento.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico clavicular</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B2','Supino Inclinado com Barra')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Supino Inclinado com Barra</div>
+          <div class="var-desc">Banco a 30°. Carga superior aos halteres, permitindo sobrecarga progressiva a longo prazo. Descida controlada até o colo (não a garganta). Barra limita a amplitude mas possibilita maior tensão absoluta na porção clavicular.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: sobrecarga progressiva</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B2','Crucifixo Inclinado (Halteres — Adução)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Crucifixo Inclinado (Halteres — Adução)</div>
+          <div class="var-desc">Movimento de adução horizontal em banco a 30–45°. Isola a porção clavicular por adução horizontal do ombro — a função primária das fibras superiores do peitoral. Cotovelo levemente fletido. Carga leve com descida máxima para ativação mTOR pelo alongamento extremo.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: adução + alongamento extremo</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B2','Supino Inclinado com Elástico (Tensão no Topo)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Supino Inclinado com Elástico (Tensão no Topo)</div>
+          <div class="var-desc">Halteres ou barra com elástico adicionado. O elástico aumenta a resistência exatamente onde o peitoral clavicular perde tensão (no topo). Compensa a curva de força e mantém estímulo mTOR também na posição encurtada da porção clavicular.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: tensão no pico clavicular</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B2','Push-Up Inclinado com Pés Elevados (Calistenics)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Chest Press Inclinado — Máquina (Incline Chest Press Machine)</div>
+          <div class="var-desc">Máquina de supino inclinado com ângulo fixo de 30–35°. Disponível em versão selectorizada (ex: Technogym, Life Fitness) ou plate-loaded (ex: Hammer Strength Incline). Arco ligeiramente convergente que centra o trabalho na porção clavicular. Pausa de 2 s na posição recuada. Sem necessidade de spotter.</div>
+          <span class="var-badge badge-joint">Máquina: incline chest press — sectorizada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B3: Desenvolvimento -->
+  <div class="ex-card" id="B3">
+    <div class="ex-header" onclick="toggleCard('B3')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Desenvolvimento de Ombros</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×8-10</span><span class="tag tag-orange">Deltóide Anterior</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>8–10</strong> reps</div><div class="spec"><strong>90s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Deltóide anterior (porção frontal) — flexão do ombro acima da cabeça</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B3','Desenvolvimento Halteres Sentado')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Desenvolvimento Halteres Sentado</div>
+          <div class="var-desc">Amplitude máxima — halteres descem até a linha do queixo ou abaixo. O deltóide anterior está em máximo alongamento com o cotovelo atrás da linha do tronco. Excêntrico de 3s ativa mTOR nesse ponto de tensão crítico.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico + amplitude</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B3','Desenvolvimento com Barra (à Frente)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Desenvolvimento com Barra (à Frente)</div>
+          <div class="var-desc">Barra desce até o queixo (não atrás — evita compressão do manguito). Maior carga que halteres. Pausa de 1s na posição baixa amplifica o estímulo de mTOR na fase de maior alongamento do deltóide anterior.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: sobrecarga + pausa na posição longa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B3','Arnold Press (Rotação do Antebraço)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Arnold Press (Rotação do Antebraço)</div>
+          <div class="var-desc">Início com palmas para o rosto (supinado), rotação para pronado durante a subida. A fase supinada coloca o deltóide anterior em posição de maior pré-ativação. Ativa as três porções do deltóide progressivamente ao longo do movimento.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: recrutamento progressivo total</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B3','Elevação Frontal com Haltere (Pré-Exaustão)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Elevação Frontal com Haltere (Pré-Exaustão)</div>
+          <div class="var-desc">Elevação frontal até 90° com haltere antes do desenvolvimento. Pré-exaure o deltóide anterior de forma isolada, forçando maior recrutamento de fibras de reserva no desenvolvimento subsequente. Protocolo de intensidade para hipertrofia avançada.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: pré-exaustão deltóide anterior</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B3','Press com Kettlebell (Bottoms-Up — Instabilidade)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Shoulder Press Machine — Selectorizada ou Plate-Loaded</div>
+          <div class="var-desc">Máquina de desenvolvimento com assento ajustável e trajetória vertical fixa. Modelos seletorizados (ex: Life Fitness, Technogym) ou plate-loaded (ex: Hammer Strength). Menor exigência de estabilizadores — permite focar 100% no deltóide anterior. Pausa de 1 s na posição baixa. Alto volume seguro.</div>
+          <span class="var-badge badge-joint">Máquina: shoulder press sectorizada</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B4: Elevação Lateral -->
+  <div class="ex-card" id="B4">
+    <div class="ex-header" onclick="toggleCard('B4')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Elevação Lateral</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×12-15</span><span class="tag tag-orange">Deltóide Lateral</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Deltóide lateral — abdução do braço, largura dos ombros</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B4','Elevação Lateral Halteres — Excêntrico Lento')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Elevação Lateral Halteres — Excêntrico Lento</div>
+          <div class="var-desc">Leve inclinação lateral, cotovelo com microfleção. Descida excêntrica de 4–5s é o protocolo mais poderoso: o deltóide lateral é mais ativo e mais vulnerável ao estímulo mTOR na fase de descida com o braço ao lado do corpo (posição mais longa).</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico — posição aduzida</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B4','Elevação Lateral Polia Baixa (Cruzada)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Elevação Lateral Polia Baixa (Cruzada)</div>
+          <div class="var-desc">Polia baixa contralateral, braço cruza levemente o corpo na posição inicial. Isso coloca o deltóide lateral em adução forçada — músculo mais alongado que ao lado do corpo — com tensão presente desde o início do movimento. Princípio de mTOR por tensão em comprimento longo.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: tensão na posição mais longa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B4','Elevação Lateral Máquina — Pausa no Topo')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Lateral Raise Machine — Selectorizada (ex: Cybex, Life Fitness)</div>
+          <div class="var-desc">Máquinas de elevação lateral com pad de cotovelo e guia de trajetória. O pad elimina substituição do trapézio que ocorre com halteres. Modelos Cybex Eagle, Life Fitness e Technogym têm curva de resistência específica para o deltóide lateral. Pausa de 2–3 s no topo + excêntrico de 3 s.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: pausa — Cybex / Life Fitness</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B4','Elevação Lateral com Haltere Apoiado (Unilateral Strict)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Elevação Lateral com Haltere Apoiado (Unilateral Strict)</div>
+          <div class="var-desc">Apoio contralateral, inclinação de 15–20° para o lado de apoio. Essa posição pré-tenciona o deltóide lateral da perna livre antes do movimento. O músculo inicia cada rep já parcialmente ativado, aumentando o recrutamento de fibras de alto limiar.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: pré-tensão + fibras alto limiar</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B4','Y-T-W com Halteres (Controle Escapular Completo)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Y-T-W com Halteres (Controle Escapular Completo)</div>
+          <div class="var-desc">Tronco inclinado 45°, executar padrões Y (elevação diagonal), T (elevação lateral horizontal) e W (rotação externa). Cobre o deltóide lateral em diferentes ângulos de abdução e recruta toda a musculatura periescapular. Protocolo de saúde + hipertrofia.</div>
+          <span class="var-badge badge-joint">Articular: deltóide + periescapular</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B5: Crucifixo Inverso -->
+  <div class="ex-card" id="B5">
+    <div class="ex-header" onclick="toggleCard('B5')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Crucifixo Inverso</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×12-15</span><span class="tag tag-orange">Deltóide Posterior</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Deltóide posterior (porção espinal) — extensão e abdução horizontal do ombro</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B5','Crucifixo Inverso Halteres (Tronco Paralelo)')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Crucifixo Inverso Halteres (Tronco Paralelo ao Chão)</div>
+          <div class="var-desc">Tronco horizontal ou sentado curvado a 90°. Abdução horizontal com cotovelo levemente fletido. O deltóide posterior está em máximo comprimento com o braço à frente — descida controlada de 3–4s ativa mTOR nessa posição elongada.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico deltóide post.</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B5','Face Pull Polia Alta (Corda)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Face Pull Polia Alta (Corda — Rotação Externa)</div>
+          <div class="var-desc">Polia alta, puxar a corda até o rosto com abdução horizontal + rotação externa do ombro. Ativa o deltóide posterior + infraespinal + redondo menor (manguito rotador). Essencial para saúde articular do ombro em treinos de empurrar de alto volume.</div>
+          <span class="var-badge badge-joint">Articular: saúde do manguito rotador</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B5','Voador Inverso — Máquina (Pec Deck Reverso)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Pec Deck Reverso — Rear Delt Fly Machine (ex: Cybex, Technogym)</div>
+          <div class="var-desc">Máquinas de pec deck com função reversa (posição frontal). Modelos Cybex Eagle Rear Delt, Technogym Selection e Life Fitness. Arco de abdução horizontal guiado com resistência constante. Pausa de 2 s na retração máxima do deltóide posterior. Protocolo de alto volume sem risco para o manguito.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: pausa — rear delt machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B5','Remada Alta (Upright Row) com Pegada Larga')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Remada Alta (Upright Row) com Pegada Larga</div>
+          <div class="var-desc">Barra ou halteres, pegada mais larga que os ombros. A pegada larga direciona o movimento para abdução horizontal, recrutando mais o deltóide posterior do que a pegada estreita (que recruta mais o trapézio). Cotovelo sobe até a linha dos ombros.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: abdução horizontal deltóide post.</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B5','Rotação Externa com Haltere (Side-Lying ER)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Rotação Externa com Haltere (Side-Lying ER)</div>
+          <div class="var-desc">Deitado de lado, cotovelo a 90°, rotação externa do ombro. Isola o infraespinal e redondo menor — músculos do manguito que trabalham em sinergia com o deltóide posterior. Protocolo de saúde do ombro + força de base para abdução horizontal pesada.</div>
+          <span class="var-badge badge-joint">Articular: manguito + deltóide posterior</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B6: Tríceps Testa -->
+  <div class="ex-card" id="B6">
+    <div class="ex-header" onclick="toggleCard('B6')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Tríceps Testa / Polia (Corda)</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×12-15</span><span class="tag tag-orange">Tríceps Cabeça Longa</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Cabeça longa do tríceps — maior porção, cruza o ombro e o cotovelo</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B6','Tríceps Testa (Barra W ou Halteres)')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Tríceps Testa (Barra W ou Halteres)</div>
+          <div class="var-desc">Ombros flexionados (~90°), cabeça longa em alongamento máximo (biarticular: ombro + cotovelo). Descida atrás/acima da cabeça é o protocolo mTOR de referência para a cabeça longa. Excêntrico lento de 3–4s. Barra W reduz torque no pulso.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: posição biarticular alongada</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B6','Extensão Tríceps Acima da Cabeça (Haltere Bilateral)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Extensão Tríceps Acima da Cabeça (Haltere Bilateral)</div>
+          <div class="var-desc">Haltere seguro com ambas as mãos, descida controlada atrás da cabeça. Ombros flexionados colocam a cabeça longa em duplo alongamento (ombro + cotovelo). ROM superior ao tríceps testa e permite amplitude mais confortável para o pulso.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: duplo alongamento cab. longa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B6','Polia Alta — Extensão sobre a Cabeça (Corda)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Overhead Tricep Extension — Máquina Dedicada (ex: Hammer Strength)</div>
+          <div class="var-desc">Máquinas específicas de extensão de tríceps acima da cabeça (ex: Hammer Strength Overhead Tricep, Cybex). Reproduz o padrão biarticular com resistência guiada que mantém o ombro em posição de máximo alongamento da cabeça longa durante toda a amplitude. Pausa de 1 s no fundo.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: biarticular guiado — overhead machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B6','JM Press (Combinação Supino + Tríceps Testa)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">JM Press (Combinação Supino + Tríceps Testa)</div>
+          <div class="var-desc">Barra desce em trajetória diagonal entre o nariz e o peito, cotovelos apontando levemente à frente. Combinação entre o supino e o tríceps testa que sobrecarrega a cabeça longa tanto na posição alongada quanto na transição concêntrica. Alta tensão total no tríceps.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: cabeça longa + tensão transição</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B6','Tríceps Francês com Haltere Unilateral')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Tríceps Francês com Haltere Unilateral</div>
+          <div class="var-desc">Um braço acima da cabeça, haltere desce atrás da cabeça com amplitude máxima. Unilateral permite maior ROM e identificação de assimetrias. O cotovelo apontando para cima garante o ombro flexionado — cabeça longa em posição de duplo alongamento durante todo o excêntrico.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: duplo alongamento unilateral</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- B7: Tríceps Polia -->
+  <div class="ex-card" id="B7">
+    <div class="ex-header" onclick="toggleCard('B7')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Tríceps Polia (Barra Reta)</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×12-15</span><span class="tag tag-orange">Tríceps Cab. Lateral + Medial</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Cabeças lateral e medial do tríceps — porção visível na lateral do braço</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('B7','Polia Barra Reta — Pushdown com Pausa')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Polia Barra Reta — Pushdown com Pausa Isométrica</div>
+          <div class="var-desc">Cotovelos fixos ao tronco, extensão completa com pausa de 1–2s. As cabeças lateral e medial são uniarticulares (só cruzam o cotovelo), portanto máxima contração ocorre na extensão total — ideal para mTOR via tensão na posição encurtada.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: contração máxima + pausa</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B7','Polia Corda — Pushdown com Abertura')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Polia Corda — Pushdown com Abertura</div>
+          <div class="var-desc">Corda aberta ao final do movimento (separação das pontas) intensifica a contração lateral ao adicionar componente de pronação na fase final. Aumenta o recrutamento da cabeça lateral especificamente no pico de contração.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: ativação lateral no pico</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('B7','Mergulho no Banco (Bench Dip) — Excêntrico')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Mergulho no Banco (Bench Dip) — Excêntrico Controlado</div>
+          <div class="var-desc">Peso corporal (ou anilha no colo). Descida lenta de 4s até 90° de flexão, subida explosiva. As cabeças lateral e medial trabalham em toda a amplitude. Ombros neutros (não protraídos) para manter o foco no tríceps e não no peitoral inferior.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico cabeças lat. + med.</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B7','Tríceps Banco (Dip em Paralelas)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Tríceps Banco (Dip em Paralelas)</div>
+          <div class="var-desc">Barras paralelas, tronco ereto (não inclinado para frente). Cotovelos próximos ao tronco. Tronco ereto direciona o trabalho para as três cabeças do tríceps em vez do peitoral. Excêntrico de 4 s. Pode adicionar anilha para progressão.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: três cabeças excêntrico</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('B7','Extensão Unilateral Polia (Kickback via Polia Baixa)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Tricep Pushdown Machine — Sectorizada (ex: Life Fitness, Technogym)</div>
+          <div class="var-desc">Máquina dedicada de extensão de tríceps com cotovelo apoiado e trajetória guiada descendente. Elimina qualquer compensação de ombro. Resistência selectorizada com curva calculada para o tríceps. Pausa de 2 s na extensão total + excêntrico de 3 s. Ideal para alto volume e finalização.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: pushdown machine — cotovelo fixo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-save" onclick="saveTreino('B')">✓ Salvar Treino B</button>
+    <button class="btn-next" onclick="nextTreino()">Próximo Treino →</button>
+  </div>
+</div>
+
+<!-- ==================== TREINO C ==================== -->
+<div class="treino-panel" id="panel-C">
+  <div class="treino-title">Treino C — Pernas & Core</div>
+  <div class="treino-desc">Quadríceps · Posterior de Coxa · Glúteos · Panturrilha · Core</div>
+
+  <!-- C1: Agachamento -->
+  <div class="ex-card" id="C1">
+    <div class="ex-header" onclick="toggleCard('C1')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Agachamento Livre / Leg Press</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×8-10</span><span class="tag tag-orange">Quadríceps + Glúteo</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>8–10</strong> reps</div><div class="spec"><strong>2min</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Quadríceps (vasto lateral, medial, intermédio) + glúteo máximo em co-contração</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C1','Agachamento Livre — Profundo (Abaixo do Paralelo)')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Agachamento Livre — Profundo (Abaixo do Paralelo)</div>
+          <div class="var-desc">Abaixo do paralelo aumenta o alongamento do glúteo máximo e o reto femoral em comprimento longo. Excêntrico de 3s e pausa de 1s no fundo. Quanto maior a profundidade com carga, maior o estímulo mTOR no quadríceps e glúteo simultaneamente.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: profundidade + excêntrico</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C1','Leg Press 45° — Pés Altos e Afastados')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Leg Press 45° — Plate-Loaded (ex: Hammer Strength, Body-Solid)</div>
+          <div class="var-desc">Leg press inclinado plate-loaded tipo Hammer Strength ou Body-Solid. Carga real sem limitação de cabo ou seletor. Pés na parte superior da plataforma e afastados. Plataforma desce até quadril próximo ao peito sem sair da base. Excêntrico de 3 s. Ativação superior de glúteo + vasto lateral.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: glúteo + vasto lateral — plate-loaded</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C1','Agachamento Goblet com Kettlebell')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Agachamento Goblet com Kettlebell</div>
+          <div class="var-desc">Carga ao peito mantém tronco vertical, facilitando profundidade máxima. Ativa vasto medial (oblíquo) de forma superior ao agachamento padrão. Excelente para corrigir o padrão motor e treinar profundidade sem estresse lombar excessivo.</div>
+          <span class="var-badge badge-joint">Articular: padrão motor + vasto medial</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C1','Agachamento Búlgaro com Barra (Sobrecarga Unilateral)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Agachamento Búlgaro com Barra (Sobrecarga Unilateral)</div>
+          <div class="var-desc">Pé traseiro elevado no banco, barra nas costas. Quadríceps da perna de apoio em trabalho unilateral com carga superior ao haltere. O reto femoral da perna traseira está em duplo alongamento. Combina os benefícios do agachamento composto com o isolamento unilateral.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: unilateral + reto femoral duplo</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C1','Sissy Squat (Isolamento do Reto Femoral)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Sissy Squat (Isolamento do Reto Femoral)</div>
+          <div class="var-desc">Em pé, calcanhar elevado, joelhos projetados à frente enquanto o tronco cai para trás. Isola o quadríceps — especialmente o reto femoral — em posição de máximo alongamento pela combinação de extensão do quadril e flexão do joelho. Alto estímulo mTOR para reto femoral.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: reto femoral isolado máximo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C2: Cadeira Extensora -->
+  <div class="ex-card" id="C2">
+    <div class="ex-header" onclick="toggleCard('C2')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Cadeira Extensora</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×12-15</span><span class="tag tag-orange">Reto Femoral (Biarticular)</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Reto femoral (biarticular: quadril + joelho) — porção central superior do quadríceps</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C2','Cadeira Extensora — Encosto Reclinado + Pausa')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Leg Extension Machine — Reclinável (ex: Cybex Eagle, Life Fitness)</div>
+          <div class="var-desc">Máquinas com encosto reclinável tipo Cybex Eagle Leg Extension ou Life Fitness. O encosto reclinado estende o quadril colocando o reto femoral (biarticular) em comprimento máximo. Pausa de 2 s no topo + excêntrico de 3–4 s. Curva de resistência calculada para o quadríceps.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: reto femoral biarticular — Cybex Eagle</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C2','Cadeira Extensora Unilateral')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Cadeira Extensora Unilateral</div>
+          <div class="var-desc">Isola cada membro para corrigir assimetrias de força do reto femoral. Mesmo protocolo de reclinação do encosto para mTOR. Força unilateral do reto femoral tem maior correlação com performance esportiva do que bilateral.</div>
+          <span class="var-badge badge-joint">Articular: simetria bilateral</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C2','Afundo Búlgaro (Bulgarian Split Squat)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Afundo Búlgaro (Bulgarian Split Squat)</div>
+          <div class="var-desc">Pé traseiro elevado, tronco inclinado levemente para frente. Reto femoral da perna de trás está em duplo alongamento (quadril estendido + joelho fletido). Protocolo mTOR máximo para o reto femoral: tensão em comprimento duplo. Também ativa fortemente o glúteo máximo ipsilateral.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: duplo alongamento reto femoral</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C2','Extensora com Isométrico Parcial nos Últimos 30°')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Extensora com Isométrico Parcial nos Últimos 30°</div>
+          <div class="var-desc">Nos últimos 30° de extensão (posição mais encurtada do reto femoral), executar 5 contrações isométricas de 2 s antes de completar cada repetição. O isométrico parcial recruta unidades motoras de alto limiar que o movimento dinâmico não alcança nessa amplitude.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: isométrico fibras alto limiar</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C2','Terminal Knee Extension (TKE) — Polia')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Terminal Knee Extension (TKE) — Polia</div>
+          <div class="var-desc">Polia baixa na parte posterior do joelho, extensão terminal dos últimos 20–30° do joelho. Isola o vasto medial oblíquo (VMO) — a porção mais distal do quadríceps, responsável pela estabilidade patelar e pela 'gota' medial da coxa. Alta ativação EMG do VMO.</div>
+          <span class="var-badge badge-joint">Isolamento VMO + estabilidade patelar</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C3: Stiff -->
+  <div class="ex-card" id="C3">
+    <div class="ex-header" onclick="toggleCard('C3')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Stiff / Terra Romeno</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×8-10</span><span class="tag tag-orange">Isquiossurais + Glúteo</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>8–10</strong> reps</div><div class="spec"><strong>2min</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Isquiossurais em posição alongada + glúteo máximo via extensão do quadril</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C3','Stiff com Barra — ROM Máximo')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Stiff com Barra — ROM Máximo</div>
+          <div class="var-desc">Joelhos levemente fletidos, quadril articulando para trás (hip hinge puro), descida até sentir tensão máxima nos isquiossurais. Excêntrico de 3–4s é o protocolo mTOR principal: os isquiossurais são mais responsivos ao estímulo em posição alongada (hip flexionado) do que à contração concêntrica.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: isquiossurais em hip hinge</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C3','Stiff com Halteres (Amplitude Ampliada)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Stiff com Halteres (Amplitude Ampliada)</div>
+          <div class="var-desc">Halteres passam lateralmente às coxas, permitindo descida além do nível do chão (especialmente em elevação). Maior amplitude = maior alongamento dos isquiossurais. Exige coluna neutra durante todo o movimento. Corrija com espelho lateral.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: amplitude superior à barra</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C3','Terra Romeno Unilateral (RDL com Haltere)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Terra Romeno Unilateral (RDL com Haltere)</div>
+          <div class="var-desc">Hip hinge unilateral com perna livre estendida para trás. A posição do quadril em extensão contralateral aumenta o alongamento do isquiossural da perna de apoio. Ativa o glúteo médio estabilizador e corrige desequilíbrios unilaterais.</div>
+          <span class="var-badge badge-joint">Articular: unilateral + glúteo médio</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C3','Good Morning com Barra (Hip Hinge com Carga Axial)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Good Morning na Smith Machine (Carga Axial Guiada)</div>
+          <div class="var-desc">Smith Machine com barra no trapézio superior, hip hinge com joelhos levemente fletidos. A trajetória guiada reduz o risco de torque lombar excessivo mantendo o padrão de hip hinge. Permite foco total no alongamento dos isquiossurais sem preocupação com equilíbrio da barra.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: hip hinge guiado — smith machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C3','45° Back Extension com Haltere')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">45° Back Extension com Haltere</div>
+          <div class="var-desc">Banco de hiperextensão a 45°. Descida excêntrica controlada até o quadril flexionar completamente — isquiossurais em posição de máximo alongamento. Adicionar haltere ao peito para progressão. Menor risco lombar que o stiff livre por não ter carga axial.</div>
+          <span class="var-badge badge-joint">Articular: sem carga axial + mTOR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C4: Flexora -->
+  <div class="ex-card" id="C4">
+    <div class="ex-header" onclick="toggleCard('C4')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Mesa / Cadeira Flexora</div>
+      <div class="ex-meta"><span class="tag tag-blue">2×10-12</span><span class="tag tag-orange">Bíceps Femoral (Flexão Joelho)</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>2</strong> séries</div><div class="spec"><strong>10–12</strong> reps</div><div class="spec"><strong>90s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Bíceps femoral via flexão do joelho (complementar ao Stiff que foca na extensão do quadril)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C4','Mesa Flexora — Excêntrico Lento (4–5s)')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Prone Leg Curl Machine — (ex: Life Fitness, Cybex Prone)</div>
+          <div class="var-desc">Máquina de leg curl deitado tipo Life Fitness Prone Leg Curl ou Cybex. Apoio patelar almofadado, resistência selectorizada com curva calculada para os isquiossurais. Protocolo: concêntrico 1 s / excêntrico 5 s. Referência para estímulo mTOR do bíceps femoral via flexão de joelho.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: excêntrico 5s — prone leg curl</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C4','Cadeira Flexora em Pé (Unilateral)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Cadeira Flexora em Pé (Unilateral)</div>
+          <div class="var-desc">Posição em pé com o quadril levemente flexionado coloca o bíceps femoral em comprimento superior ao deitado. Pesquisas de EMG mostram maior ativação do bíceps femoral na flexora em pé vs. deitado, especialmente nas últimas repetições. Protocolo mTOR superior.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: quadril flexionado — maior comprimento</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C4','Curl Nórdico (Nordic Hamstring Curl)')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Curl Nórdico (Nordic Hamstring Curl)</div>
+          <div class="var-desc">Pés fixos, descida excêntrica controlada do corpo inteiro. O bíceps femoral trabalha em todo o espectro de comprimento possível, de máxima extensão do joelho (posição mais longa) até 90°. Considerado o exercício de maior estímulo mTOR e menor risco de lesão isquiossural na literatura.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: excêntrico máximo + espectro total</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C4','Leg Curl Excêntrico Sobrecarregado (Negativa)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Leg Curl Excêntrico Sobrecarregado (Negativa)</div>
+          <div class="var-desc">Usar as duas pernas para subir (concêntrico facilitado) e descer com apenas uma (excêntrico sobrecarregado — 150% da carga unilateral). Protocolo de sobrecarga excêntrica comprovado para maximizar mTOR nos isquiossurais. Exige parceiro ou máquina com regulagem rápida.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: sobrecarga excêntrica 150%</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C4','Glute-Ham Raise (GHR)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Glute-Ham Raise (GHR)</div>
+          <div class="var-desc">Banco GHR, joelhos apoiados, descida excêntrica controlada. Combina flexão do joelho (bíceps femoral via leg curl) e extensão do quadril (glúteo máximo) no mesmo movimento. Ativa isquiossurais em dois pontos de inserção simultaneamente — protocolo de alta transferência.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: biarticular isquiossurais completo</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C5: Gêmeos em Pé -->
+  <div class="ex-card" id="C5">
+    <div class="ex-header" onclick="toggleCard('C5')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Gêmeos em Pé</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×12-15</span><span class="tag tag-orange">Gastrocnêmio</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Gastrocnêmio (biarticular: cruza joelho e tornozelo) — cabeças medial e lateral visíveis</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C5','Gêmeos em Pé — Degrau com Pausa')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Gêmeos em Pé — Degrau com Pausa</div>
+          <div class="var-desc">Calcanhar desce abaixo do nível do degrau (dorsiflexão máxima) + pausa de 2s no topo (flexão plantar máxima). O gastrocnêmio é biarticular: joelho estendido é obrigatório para seu máximo recrutamento. ROM completo ativa mTOR em ambas as fases.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: amplitude total + biarticular</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C5','Gêmeos em Pé Unilateral — Haltere')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Gêmeos em Pé Unilateral — Haltere</div>
+          <div class="var-desc">Maior carga efetiva por perna, corrige assimetrias. O gastrocnêmio tem alto percentual de fibras tipo II — responde bem à sobrecarga progressiva. Mão livre para equilíbrio, foco total na contração e excêntrico de 3s.</div>
+        
+          <span class="var-badge badge-joint">Articular: sobrecarga unilateral</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C5','Calves no Leg Press — ROM Ampliado')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Standing Calf Raise Machine — Plate-Loaded (ex: Hammer Strength)</div>
+          <div class="var-desc">Máquina de gêmeos em pé plate-loaded tipo Hammer Strength ou selectorizada Life Fitness. Ombros no suporte, joelhos totalmente estendidos (gastrocnêmio biarticular ativado). Permite carga muito superior ao haltere. Dorsiflexão máxima + pausa de 2 s + excêntrico de 3 s.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: sobrecarga — standing calf machine</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C5','Donkey Calf Raise (Quadril Flexionado a 90°)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Donkey Calf Raise (Quadril Flexionado a 90°)</div>
+          <div class="var-desc">Tronco horizontal (apoiado) com o quadril a 90°. O gastrocnêmio é biarticular — com o joelho estendido e o quadril flexionado, suas duas cabeças ficam em comprimento ainda maior que no gêmeo em pé convencional. Estímulo mTOR superior para o gastrocnêmio.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: gastrocnêmio em comprimento máximo</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C5','Salto em Caixa com Aterrissagem Controlada (Calf Plyométrico)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Salto em Caixa com Aterrissagem Controlada (Calf Plyométrico)</div>
+          <div class="var-desc">Saltos no lugar com ênfase na propulsão pelo tornozelo (não pelo joelho). Aterrissagem silenciosa absorvendo o impacto primariamente no gastrocnêmio. O excêntrico pliométrico ativa fibras do gastrocnêmio do tipo II de forma que o exercício convencional não consegue.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: fibras tipo II pliométrico</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C6: Gêmeos Sentado -->
+  <div class="ex-card" id="C6">
+    <div class="ex-header" onclick="toggleCard('C6')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Gêmeos Sentado</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×12-15</span><span class="tag tag-orange">Sóleo (Monoarticular)</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Sóleo — músculo monoarticular profundo, responsável pela profundidade da panturrilha</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C6','Gêmeos Sentado — Máquina + Pausa Bilateral')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Seated Calf Raise Machine — (ex: Cybex, Life Fitness, Technogym)</div>
+          <div class="var-desc">Máquinas de sóleo sentado tipo Cybex, Life Fitness ou Technogym. Joelho a 90° desativa o gastrocnêmio, isolando o sóleo. Algumas máquinas permitem ajuste do ângulo do joelho para variar o comprimento do sóleo. Pausa de 3 s no topo + excêntrico de 3 s. O sóleo tipo I responde ao tempo sob tensão.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: isolamento sóleo — seated calf machine</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C6','Gêmeos Sentado com Haltere no Joelho')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Gêmeos Sentado com Haltere no Joelho (+ Placa sob os Dedos)</div>
+          <div class="var-desc">Banco com haltere pesado sobre o joelho, placa sob os dedos para ampliar o ROM de dorsiflexão. Mesma mecânica do sentado em máquina com maior amplitude. Joelho a 90° obrigatório para isolar o sóleo.</div>
+          <span class="var-badge badge-joint">Articular: alternativa livre + ROM</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C6','Protocolo 1.5x — Gêmeos Sentado')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Protocolo 1.5× — Gêmeos Sentado</div>
+          <div class="var-desc">Sobe completo → desce 50% → sobe ao topo → desce total = 1 rep. Dobra o tempo sob tensão no sóleo por série. Ideal para panturrilhas resistentes ao estímulo convencional. O sóleo tipo I é especialmente responsivo a este protocolo.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: tempo sob tensão 2× + sóleo tipo I</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C6','Calf Sentado com Joelho a 120° (Sóleo Encurtado)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Calf Sentado com Joelho a 120° (Sóleo Encurtado)</div>
+          <div class="var-desc">Joelho além dos 90° convencionais (aproximadamente 120° de flexão). Com o joelho mais flexionado, o sóleo fica em posição mais encurtada — protocolo para estimular as fibras que não são alcançadas no ângulo padrão. Parcial superior com alto volume.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: sóleo em posição encurtada</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C6','Calf Sentado com Joelho a 60° (Sóleo Mais Longo)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Calf Sentado com Joelho a 60° (Sóleo Mais Longo)</div>
+          <div class="var-desc">Joelho a 60° (menos flexionado que o padrão de 90°). O sóleo fica em posição de maior comprimento, sobrepondo-se mais com o gastrocnêmio. Tensão mTOR na posição mais longa do sóleo — protocolo complementar ao ângulo padrão para cobertura total do espectro.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: sóleo em posição mais longa</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- C7: Abdominal -->
+  <div class="ex-card" id="C7">
+    <div class="ex-header" onclick="toggleCard('C7')">
+      <div class="ex-check"><svg width="11" height="9" viewBox="0 0 11 9"><path d="M1 4l3 3 6-6" stroke="#0d1117" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div>
+      <div class="ex-name">Abdominal Infra + Supra</div>
+      <div class="ex-meta"><span class="tag tag-blue">3×12-15</span><span class="tag tag-orange">Reto Abdominal</span></div>
+      <div class="ex-chevron">▾</div>
+    </div>
+    <div class="ex-specs">
+      <div class="spec"><strong>3</strong> séries</div><div class="spec"><strong>12–15</strong> reps</div><div class="spec"><strong>60s</strong> descanso</div>
+    </div>
+    <div class="ex-target"><span>Alvo:</span> Reto abdominal completo — porção superior (flexão do tronco) e inferior (flexão do quadril)</div>
+    <div class="ex-drawer">
+      <div class="drawer-header">Escolha sua variação — mesmo alvo muscular</div>
+      <div class="var-item" onclick="chooseVar('C7','Elevação de Quadril + Crunch Sequencial')">
+        <div class="var-num">1</div>
+        <div class="var-content">
+          <div class="var-name">Elevação de Quadril + Crunch Sequencial</div>
+          <div class="var-desc">Supino: eleva o quadril (recruta porção inferior) → mantém → faz crunch (recruta porção superior). Sequência combinada cobre toda a extensão do reto abdominal em uma série.</div>
+          <span class="var-badge badge-mtor-conc">mTOR: cobertura total superior + inferior</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C7','Abdominal em Polia Alta (Crunch com Resistência)')">
+        <div class="var-num">2</div>
+        <div class="var-content">
+          <div class="var-name">Ab Crunch na Polia Alta ou Máquina de Ab (ex: Life Fitness Ab Crunch)</div>
+          <div class="var-desc">Polia alta com corda (joelhos no chão) ou Máquina dedicada de Ab Crunch tipo Life Fitness ou Technogym. Ambas permitem sobrecarga progressiva real do reto abdominal — o único exercício de core com esse recurso. Excêntrico de 3 s até máximo alongamento. Progressão de carga semanal.</div>
+          <span class="var-badge badge-mtor-alon">mTOR: sobrecarga progressiva — ab machine</span>
+        </div>
+      </div>
+      <div class="var-item" onclick="chooseVar('C7','Prancha com Elevação Alternada de Membro')">
+        <div class="var-num">3</div>
+        <div class="var-content">
+          <div class="var-name">Prancha com Elevação Alternada de Membro</div>
+          <div class="var-desc">Prancha em 4 apoios + extensão alternada de braço e perna opostos. Reto abdominal e transverso atuam isometricamente contra torque de rotação. Ativa oblíquos interno e externo como estabilizadores do raquis.</div>
+          <span class="var-badge badge-joint">Articular: estabilização anti-rotação</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C7','Dragon Flag (Progressão Abdominal Avançada)')">
+        <div class="var-num">4</div>
+        <div class="var-content">
+          <div class="var-name">Dragon Flag (Progressão Abdominal Avançada)</div>
+          <div class="var-desc">Deitado no banco, segurar o suporte atrás da cabeça, elevar o corpo inteiro mantendo-o reto e descendo excêntricamente. O reto abdominal trabalha isometricamente para manter a coluna neutra contra a gravidade em todo o comprimento — o exercício de maior intensidade absoluta para o core.</div>
+          <span class="var-badge badge-mtor-exc">mTOR: reto abdominal isométrico total</span>
+        </div>
+      </div>
+    
+      <div class="var-item" onclick="chooseVar('C7','Hollow Body Hold com Progressão (Reto Inferior)')">
+        <div class="var-num">5</div>
+        <div class="var-content">
+          <div class="var-name">Hollow Body Hold com Progressão (Reto Inferior)</div>
+          <div class="var-desc">Posição hollow (lombar no chão, pernas e braços estendidos a poucos cm do chão). Segura 20–30 s com progressão de carga via extensão progressiva dos membros. Ativa o reto abdominal inferior e o transverso de forma isométrica contra a tendência de extensão lombar.</div>
+          <span class="var-badge badge-joint">Articular: anti-extensão lombar + reto inf.</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-bar">
+    <button class="btn-save" onclick="saveTreino('C')">&#10003; Salvar Treino C</button>
+    <button class="btn-next" onclick="nextTreino()">Próximo Treino &#8594;</button>
+  </div>
+</div>
+
+<!-- RELATÓRIO -->
+<div class="treino-panel" id="panel-R">
+  <div class="rel-header">Relatório de Treinos</div>
+  <div id="relStats" class="rel-stats"></div>
+  <div id="relContent"></div>
+</div>
+
+<!-- MODAL RESET -->
+<div class="modal-overlay" id="modalReset">
+  <div class="modal-box">
+    <div class="modal-title">Reiniciar Treino</div>
+    <div class="modal-desc">Isso vai limpar as variações escolhidas e reiniciar o ciclo para o Treino A. O histórico de treinos salvos não será apagado.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-cancel" onclick="closeResetModal()">Cancelar</button>
+      <button class="modal-btn-confirm" onclick="confirmReset()">Reiniciar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var CYCLE = ['A','B','C'];
+var KEY_CYCLE   = 'mm_cycle_current';
+var KEY_HISTORY = 'mm_history';
+var KEY_VARS    = 'mm_vars';
+var KEY_SEL     = 'mm_selected';
+
+function loadState() {
+  return {
+    idx:      parseInt(localStorage.getItem(KEY_CYCLE) || '0'),
+    history:  JSON.parse(localStorage.getItem(KEY_HISTORY) || '[]'),
+    vars:     JSON.parse(localStorage.getItem(KEY_VARS) || '{}'),
+    selected: JSON.parse(localStorage.getItem(KEY_SEL) || '{}')
+  };
+}
+
+function saveState(s) {
+  localStorage.setItem(KEY_CYCLE,   String(s.idx));
+  localStorage.setItem(KEY_HISTORY, JSON.stringify(s.history));
+  localStorage.setItem(KEY_VARS,    JSON.stringify(s.vars));
+  localStorage.setItem(KEY_SEL,     JSON.stringify(s.selected));
+}
+
+function showTab(t) {
+  var panels = document.querySelectorAll('.treino-panel');
+  for (var i=0; i<panels.length; i++) panels[i].classList.remove('active');
+  document.getElementById('panel-' + t).classList.add('active');
+  var tabs = document.querySelectorAll('.tab-btn');
+  for (var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+  document.getElementById('tab-' + t).classList.add('active');
+  if (t === 'R') renderRelatorio();
+  // update cycle badge to match visible tab
+  var s = loadState();
+  var tabToLetter = {'A':'A','B':'B','C':'C'};
+  if (tabToLetter[t]) {
+    var idx = CYCLE.indexOf(t);
+    if (idx !== -1) { s.idx = idx; saveState(s); }
+    document.getElementById('cycleBadge').textContent = 'Ciclo ' + (tabToLetter[t] || CYCLE[s.idx]);
+  }
+}
+
+function toggleCard(id) {
+  var card = document.getElementById(id);
+  if (card) card.classList.toggle('open');
+}
+
+function chooseVar(exId, varName) {
+  var s = loadState();
+  s.vars[exId] = varName;
+  s.selected[exId] = true;
+  saveState(s);
+  var card = document.getElementById(exId);
+  if (!card) return;
+  card.classList.add('selected');
+  var items = card.querySelectorAll('.var-item');
+  for (var i=0; i<items.length; i++) {
+    var nm = items[i].querySelector('.var-name');
+    if (nm && nm.textContent === varName) items[i].classList.add('chosen');
+    else items[i].classList.remove('chosen');
+  }
+  card.classList.remove('open');
+  showToast('Variacao: ' + varName.split(' ')[0], false);
+}
+
+function saveTreino(letter) {
+  var s = loadState();
+  var now  = new Date();
+  var date = now.toLocaleDateString('pt-BR') + ' ' + now.toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'});
+  var ids = letter === 'A'
+    ? ['A1','A2','A3','A4','A5','A6']
+    : letter === 'B'
+    ? ['B1','B2','B3','B4','B5','B6','B7']
+    : ['C1','C2','C3','C4','C5','C6','C7'];
+  var exNames = {
+    A1:'Puxada Alta',A2:'Remada Baixa',A3:'Encolhimento',A4:'Rosca Direta',A5:'Rosca Martelo',A6:'Rosca Inversa',
+    B1:'Supino Reto',B2:'Supino Inclinado',B3:'Desenvolvimento',B4:'Elev. Lateral',B5:'Crucifixo Inv.',B6:'Triceps Testa',B7:'Triceps Polia',
+    C1:'Agachamento',C2:'Cadeira Ext.',C3:'Stiff/RDL',C4:'Mesa Flexora',C5:'Gemeos Pe',C6:'Gemeos Sentado',C7:'Abdominal'
+  };
+  var exercises = ids.map(function(id){ return {id:id, name:exNames[id]||id, variation:s.vars[id]||'—'}; });
+  s.history.unshift({treino:letter, date:date, exercises:exercises});
+  if (s.history.length > 20) s.history = s.history.slice(0,20);
+  saveState(s);
+  renderRelatorio();
+  showToast('Treino ' + letter + ' salvo — ' + date, true);
+}
+
+function nextTreino() {
+  var s = loadState();
+  s.idx = (s.idx + 1) % 3;
+  saveState(s);
+  var next = CYCLE[s.idx];
+  document.getElementById('cycleBadge').textContent = 'Ciclo ' + next;
+  showTab(next);
+  window.scrollTo({top:0,behavior:'smooth'});
+  showToast('Proximo treino: ' + next, false);
+}
+
+function getTreinoName(l) {
+  return l==='A'?'Puxar':l==='B'?'Empurrar':'Pernas & Core';
+}
+
+function openResetModal()  { document.getElementById('modalReset').classList.add('show'); }
+function closeResetModal() { document.getElementById('modalReset').classList.remove('show'); }
+
+function confirmReset() {
+  var s = loadState();
+  s.idx = 0; s.vars = {}; s.selected = {};
+  saveState(s);
+  closeResetModal();
+  document.getElementById('cycleBadge').textContent = 'Ciclo A';
+  var cards = document.querySelectorAll('.ex-card');
+  for (var i=0; i<cards.length; i++) {
+    cards[i].classList.remove('selected','open');
+    var items = cards[i].querySelectorAll('.var-item');
+    for (var j=0; j<items.length; j++) items[j].classList.remove('chosen');
+  }
+  showTab('A');
+  showToast('Treino reiniciado — Ciclo A', false);
+}
+
+function renderRelatorio() {
+  var s = loadState();
+  var stats = document.getElementById('relStats');
+  var content = document.getElementById('relContent');
+  var total = s.history.length;
+  var cntA = s.history.filter(function(h){return h.treino==='A';}).length;
+  var cntB = s.history.filter(function(h){return h.treino==='B';}).length;
+  var cntC = s.history.filter(function(h){return h.treino==='C';}).length;
+  stats.innerHTML = total===0 ? '' :
+    '<div class="stat-pill"><div class="stat-num">'+total+'</div><div class="stat-label">Total</div></div>'+
+    '<div class="stat-pill"><div class="stat-num">'+cntA+'</div><div class="stat-label">Puxar (A)</div></div>'+
+    '<div class="stat-pill"><div class="stat-num orange">'+cntB+'</div><div class="stat-label">Empurrar (B)</div></div>'+
+    '<div class="stat-pill"><div class="stat-num green">'+cntC+'</div><div class="stat-label">Pernas (C)</div></div>';
+  if (total===0) {
+    content.innerHTML = '<div class="rel-empty">Nenhum treino salvo ainda.<br>Conclua e salve um treino para ver o historico aqui.</div>';
+    return;
+  }
+  var rows = s.history.map(function(h,i){
+    var colorClass = h.treino==='B'?' b-B':h.treino==='C'?' b-C':'';
+    var exRows = h.exercises ? h.exercises.map(function(e){
+      return '<div class="rel-ex-row"><span class="rel-ex-name">'+e.name+'</span><span class="rel-ex-var">'+e.variation.split(' ')[0]+'</span></div>';
+    }).join('') : '';
+    var exCount = h.exercises ? h.exercises.filter(function(e){return e.variation!=='—';}).length : 0;
+    return '<div class="rel-card" id="rel-'+i+'">'+
+      '<div class="rel-card-header" onclick="toggleRel('+i+')">'+
+      '<div class="rel-treino-badge'+colorClass+'">'+h.treino+'</div>'+
+      '<div class="rel-meta-col"><div class="rel-date">'+h.date+'</div><div class="rel-excount">'+exCount+' variacoes registradas</div></div>'+
+      '<div class="rel-chevron">&#9662;</div></div>'+
+      '<div class="rel-body">'+exRows+'</div></div>';
+  }).join('');
+  content.innerHTML = rows + '<button class="rel-clear" onclick="clearHistory()">Limpar historico completo</button>';
+}
+
+function toggleRel(i) {
+  var card = document.getElementById('rel-'+i);
+  if (card) card.classList.toggle('open');
+}
+
+function clearHistory() {
+  if (!confirm('Apagar todo o historico?')) return;
+  var s = loadState();
+  s.history = [];
+  saveState(s);
+  renderRelatorio();
+}
+
+function showToast(msg, green) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (green?' green':'') + ' show';
+  setTimeout(function(){ t.className='toast'; }, 2800);
+}
+
+function restoreVars() {
+  var s = loadState();
+  var keys = Object.keys(s.vars);
+  for (var k=0; k<keys.length; k++) {
+    var exId = keys[k];
+    var varName = s.vars[exId];
+    var card = document.getElementById(exId);
+    if (!card) continue;
+    card.classList.add('selected');
+    var items = card.querySelectorAll('.var-item');
+    for (var i=0; i<items.length; i++) {
+      var nm = items[i].querySelector('.var-name');
+      if (nm && nm.textContent===varName) items[i].classList.add('chosen');
+      else items[i].classList.remove('chosen');
+    }
+  }
+}
+
+function init() {
+  var s = loadState();
+  var cur = CYCLE[s.idx];
+  document.getElementById('cycleBadge').textContent = 'Ciclo ' + cur;
+  var panels = document.querySelectorAll('.treino-panel');
+  for (var i=0; i<panels.length; i++) panels[i].classList.remove('active');
+  document.getElementById('panel-' + cur).classList.add('active');
+  var tabs = document.querySelectorAll('.tab-btn');
+  for (var i=0; i<tabs.length; i++) tabs[i].classList.remove('active');
+  document.getElementById('tab-' + cur).classList.add('active');
+  restoreVars();
+}
+
+init();
+</script>
+</body>
+</html>
